@@ -2,8 +2,10 @@
 //
 
 #include "stdafx.h"
-#include <Shobjidl.h>
+
 #include "OpenEdge.h"
+
+
 
 #define MAX_LOADSTRING 100
 
@@ -69,18 +71,35 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		);
 		return 0;
 	}
-	CoInitialize(NULL);
-	if(IsFile(__targv[1]))
-	{
-		TCHAR szT[4096];
-		szT[0] = 0;
-		GetPrivateProfileString(_T("InternetShortcut"), _T("URL"), _T(""), szT, sizeof(szT)/sizeof(szT[0]), __targv[1]);
 
-		OpenUrlInMicrosoftEdge(szT);
-	}
-	else
+	HRESULT hr = E_FAIL;
+	hr = CoInitialize(NULL);
+	if (SUCCEEDED(hr))
 	{
-		OpenUrlInMicrosoftEdge(__targv[1]);
+		if (IsFile(__targv[1]))
+		{
+			TCHAR szT[4096];
+			szT[0] = 0;
+			GetPrivateProfileString(_T("InternetShortcut"), _T("URL"), _T(""), szT, sizeof(szT) / sizeof(szT[0]), __targv[1]);
+
+			hr = OpenUrlInMicrosoftEdge(szT);
+		}
+		else
+		{
+			hr = OpenUrlInMicrosoftEdge(__targv[1]);
+		}
+		CoUninitialize();
+	}
+
+	if (FAILED(hr))
+	{
+		tstring s = GetLastErrorString(hr);
+		MessageBox(NULL,
+			s.c_str(),
+			_T("OpenEdge"),
+			MB_ICONERROR
+		);
+		return hr;
 	}
     // TODO: Place code here.
 
