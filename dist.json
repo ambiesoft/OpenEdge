@@ -14,7 +14,7 @@
     "remotedir": "http://ambiesoft.fam.cx/ffdav/uploads/OpenEdge/",
     "remotesha1" : "http://ambiesoft.fam.cx/ffdav/uploads/getSha1.php?file=mdview/{}",
     
-    "TotalFileCount": 4333333333333333,
+    "TotalFileCount": 4,
     
     "ShouldNotBeFiles": [
     	"OpenEdge.ini"
