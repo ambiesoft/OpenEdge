@@ -24,4 +24,4 @@
 #include <atlstr.h>
 
 // TODO: reference additional headers your program requires here
-#include "../../MyUtility/GetLastErrorString.h"
+#include "../../lsMisc/GetLastErrorString.h"

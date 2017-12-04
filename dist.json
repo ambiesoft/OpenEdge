@@ -1,0 +1,30 @@
+{
+	"name": "OpenEdge",
+	"solution": "OpenEdge.sln",
+	"targetproject": "OpenEdge",
+	"configuration": "Release",
+    "targets": [
+            {
+            	"setoutdirforbuild": true,
+                "outdir" : "C:/Linkout/OpenEdge/",
+                "platform":"x86"
+            }
+    ],
+    "archivedir": "C:/Linkout/",
+    "remotedir": "http://ambiesoft.fam.cx/ffdav/uploads/OpenEdge/",
+    "remotesha1" : "http://ambiesoft.fam.cx/ffdav/uploads/getSha1.php?file=mdview/{}",
+    
+    "TotalFileCount": 4333333333333333,
+    
+    "ShouldNotBeFiles": [
+    	"OpenEdge.ini"
+    ],
+    
+    "ShouldBeFiles": [
+    ],
+    
+    "ShouldBeOneOfThem": [],
+    
+    "obtainverfrom": "History.txt",
+    "obtainverregex": "ver\\d+\\.\\d+"
+}

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="History.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -30,7 +31,7 @@
     <ClInclude Include="OpenEdge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\MyUtility\GetLastErrorString.h">
+    <ClInclude Include="..\..\lsMisc\GetLastErrorString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +42,7 @@
     <ClCompile Include="OpenEdge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\MyUtility\GetLastErrorString.cpp">
+    <ClCompile Include="..\..\lsMisc\GetLastErrorString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
