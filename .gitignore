@@ -1,0 +1,12 @@
+
+# /
+/.vs
+/Debug
+/OpenEdge.VC.db
+/Release
+/ipch
+
+# /OpenEdge/
+/OpenEdge/Debug
+/OpenEdge/Release
+/OpenEdge/*.user
