@@ -12,7 +12,7 @@
     ],
     "archivedir": "C:/Linkout/",
     "remotedir": "http://ambiesoft.fam.cx/ffdav/uploads/OpenEdge/",
-    "remotesha1" : "http://ambiesoft.fam.cx/ffdav/uploads/getSha1.php?file=mdview/{}",
+    "remotesha1" : "http://ambiesoft.fam.cx/ffdav/uploads/getSha1.php?file=OpenEdge/{}",
     
     "TotalFileCount": 4,
     
