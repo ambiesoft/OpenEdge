@@ -55,6 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,6 +76,7 @@ copy "$(SolutionDir)License" "$(TargetDir)"
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../lsMisc/stlsoft/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,14 +96,24 @@ copy "$(ProjectDir)History.txt" "$(TargetDir)"
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\lsMisc\CommandLineParser.h" />
+    <ClInclude Include="..\..\lsMisc\GetClipboardText.h" />
     <ClInclude Include="..\..\lsMisc\GetLastErrorString.h" />
+    <ClInclude Include="..\..\lsMisc\stdwin32\stdwin32.h" />
+    <ClInclude Include="..\..\lsMisc\UrlEncode.h" />
+    <ClInclude Include="..\..\lsMisc\UTF16toUTF8.h" />
     <ClInclude Include="OpenEdge.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\lsMisc\CommandLineParser.cpp" />
+    <ClCompile Include="..\..\lsMisc\GetClipboardText.cpp" />
     <ClCompile Include="..\..\lsMisc\GetLastErrorString.cpp" />
+    <ClCompile Include="..\..\lsMisc\stdwin32\stdwin32.cpp" />
+    <ClCompile Include="..\..\lsMisc\UrlEncode.cpp" />
+    <ClCompile Include="..\..\lsMisc\UTF16toUTF8.cpp" />
     <ClCompile Include="OpenEdge.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -28,8 +28,12 @@
 
 #include "OpenEdge.h"
 
-
+#include "../../lsMisc/CommandLineParser.h"
+#include "../../lsMisc/GetClipboardText.h"
+#include "../../lsMisc/stdwin32/stdwin32.h"
 using namespace Ambiesoft;
+using namespace std;
+using namespace stdwin32;
 
 #define MAX_LOADSTRING 100
 
@@ -78,84 +82,6 @@ BOOL IsFile(LPCTSTR p)
 	}
 	return FALSE;
 }
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
-{
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-
-	if (__argc < 2)
-	{
-		MessageBox(NULL,
-			_T("OpenEdge [url] or [.url file]"),
-			_T("OpenEdge"),
-			MB_ICONINFORMATION
-		);
-		return 0;
-	}
-
-	HRESULT hr = E_FAIL;
-	hr = CoInitialize(NULL);
-	if (SUCCEEDED(hr))
-	{
-		if (IsFile(__targv[1]))
-		{
-			TCHAR szT[4096];
-			szT[0] = 0;
-			GetPrivateProfileString(_T("InternetShortcut"), _T("URL"), _T(""), szT, sizeof(szT) / sizeof(szT[0]), __targv[1]);
-
-			hr = OpenUrlInMicrosoftEdge(szT);
-		}
-		else
-		{
-			hr = OpenUrlInMicrosoftEdge(__targv[1]);
-		}
-		CoUninitialize();
-	}
-
-	if (FAILED(hr))
-	{
-		tstring s = GetLastErrorString(hr);
-		MessageBox(NULL,
-			s.c_str(),
-			_T("OpenEdge"),
-			MB_ICONERROR
-		);
-		return hr;
-	}
-    // TODO: Place code here.
-
-    // Initialize global strings
-    //LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    //LoadStringW(hInstance, IDC_OPENEDGE, szWindowClass, MAX_LOADSTRING);
-    //MyRegisterClass(hInstance);
-
-    //// Perform application initialization:
-    //if (!InitInstance (hInstance, nCmdShow))
-    //{
-    //    return FALSE;
-    //}
-
-    //HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OPENEDGE));
-
-    //MSG msg;
-
-    //// Main message loop:
-    //while (GetMessage(&msg, nullptr, 0, 0))
-    //{
-    //    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-    //    {
-    //        TranslateMessage(&msg);
-    //        DispatchMessage(&msg);
-    //    }
-    //}
-
-	return 0;
-}
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -278,3 +204,158 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return (INT_PTR)FALSE;
 }
+
+void ErrorDialog(LPCWSTR pMessage, int mb = MB_ICONEXCLAMATION)
+{
+	wstring message;
+	if (pMessage)
+	{
+		message += pMessage;
+		message += L"\n\n";
+	}
+	message += _T("OpenEdge [-b] [-c] [url] or [.url file]\n\n");
+	message += _T("  -b\n");
+	message += _T("    Open blank page\n");
+	message += L"\n";
+	message += _T("  -c\n");
+	message += _T("    Treat clipboard text as url and open\n");
+
+	wstring title;
+	title += APPNAME;
+	title += L" ver";
+	title += VERSION;
+	MessageBox(NULL,
+		message.c_str(),
+		title.c_str(),
+		mb
+	);
+}
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+{
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	vector<wstring> targets;
+	CCommandLineParser parser;
+	
+	COption mainOption(L"");
+	parser.AddOption(&mainOption);
+	
+	bool isClipboard = false;
+	parser.AddOption(L"-c", 0, &isClipboard);
+
+	bool openBlank = false;
+	parser.AddOption(L"-b", 0, &openBlank);
+
+	parser.Parse();
+
+	if (parser.hadUnknownOption())
+	{
+		ErrorDialog(string_format(I18N(L"Unknown option(s) %s"),
+			parser.getUnknowOptionStrings().c_str()).c_str());
+		return 1;
+	}
+		 
+	if (__argc < 2)
+	{
+		ErrorDialog(nullptr, MB_ICONINFORMATION);
+		return 0;
+	}
+
+	if (openBlank)
+	{
+		targets.push_back(L"about:blank");
+	}
+	if (isClipboard)
+	{
+		wstring clip;
+		if (!GetClipboardText(NULL, clip))
+		{
+			ErrorDialog(I18N(L"Failed to get clipboard text"));
+		}
+		targets.emplace_back(clip);
+	}
+	for (size_t i = 0; i < mainOption.getValueCount(); ++i)
+	{
+		targets.emplace_back(mainOption.getValue(i));
+	}
+
+	HRESULT hr;
+	hr = CoInitialize(NULL);
+	if (FAILED(hr))
+	{
+		tstring s = GetLastErrorString(hr);
+		ErrorDialog(s.c_str());
+		return 1;
+	}
+	
+	for each(const wstring& target in targets)
+	{
+		if (IsFile(target.c_str()))
+		{
+			TCHAR szT[4096];
+			szT[0] = 0;
+			GetPrivateProfileString(
+				_T("InternetShortcut"),
+				_T("URL"),
+				_T(""),
+				szT,
+				sizeof(szT) / sizeof(szT[0]),
+				target.c_str());
+
+			hr = OpenUrlInMicrosoftEdge(szT);
+		}
+		else
+		{
+			hr = OpenUrlInMicrosoftEdge(target.c_str());
+		}
+		if (FAILED(hr))
+			break;
+	}
+	CoUninitialize();
+
+
+	if (FAILED(hr))
+	{
+		tstring s = GetLastErrorString(hr);
+		MessageBox(NULL,
+			s.c_str(),
+			_T("OpenEdge"),
+			MB_ICONERROR
+		);
+		return hr;
+	}
+	// TODO: Place code here.
+
+	// Initialize global strings
+	//LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	//LoadStringW(hInstance, IDC_OPENEDGE, szWindowClass, MAX_LOADSTRING);
+	//MyRegisterClass(hInstance);
+
+	//// Perform application initialization:
+	//if (!InitInstance (hInstance, nCmdShow))
+	//{
+	//    return FALSE;
+	//}
+
+	//HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OPENEDGE));
+
+	//MSG msg;
+
+	//// Main message loop:
+	//while (GetMessage(&msg, nullptr, 0, 0))
+	//{
+	//    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+	//    {
+	//        TranslateMessage(&msg);
+	//        DispatchMessage(&msg);
+	//    }
+	//}
+
+	return 0;
+}
+
+

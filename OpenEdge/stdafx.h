@@ -23,5 +23,11 @@
 #include <atlbase.h>
 #include <atlstr.h>
 
+#include <string>
+#include <vector>
 // TODO: reference additional headers your program requires here
 #include "../../lsMisc/GetLastErrorString.h"
+
+#define I18N(s) (s)
+#define APPNAME L"OpenEdge"
+#define VERSION L"1.1"
