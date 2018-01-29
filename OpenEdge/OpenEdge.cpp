@@ -275,8 +275,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (!GetClipboardText(NULL, clip))
 		{
 			ErrorDialog(I18N(L"Failed to get clipboard text"));
+			return 1;
 		}
-		targets.emplace_back(clip);
+
+		vector<wstring> lines = stdwin32::split_string_toline(clip);
+		if (lines.size() > 20)
+		{
+			if (IDYES != MessageBox(NULL,
+				I18N(string_format(L"Clipboard texts has %d lines. Are you sure you want to open them all?",
+					lines.size()).c_str()),
+				APPNAME,
+				MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2))
+			{
+				return 1;
+			}
+		}
+		for (const wstring& line : lines)
+		{
+			targets.emplace_back(stdwin32::trim(line));
+		}
 	}
 	for (size_t i = 0; i < mainOption.getValueCount(); ++i)
 	{
