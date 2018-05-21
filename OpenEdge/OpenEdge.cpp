@@ -49,16 +49,15 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 
-HRESULT OpenUrlInMicrosoftEdge(__in PCWSTR url)
+HRESULT OpenUrlInStoreApp(__in LPCWSTR pAUMID, __in PCWSTR url)
 {
 	HRESULT hr = E_FAIL;
 	CComPtr<IApplicationActivationManager> activationManager;
-	LPCWSTR edgeAUMID = L"Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge";
 	hr = CoCreateInstance(CLSID_ApplicationActivationManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&activationManager));
 	if (SUCCEEDED(hr))
 	{
 		DWORD newProcessId;
-		hr = activationManager->ActivateApplication(edgeAUMID, url, AO_NONE, &newProcessId);
+		hr = activationManager->ActivateApplication(pAUMID, url, AO_NONE, &newProcessId);
 	}
 	else
 	{
@@ -250,6 +249,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	bool openBlank = false;
 	parser.AddOption(L"-b", 0, &openBlank);
 
+	wstring app;
+	parser.AddOption(L"-app", 1, &app);
+
 	parser.Parse();
 
 	if (parser.hadUnknownOption())
@@ -308,7 +310,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		ErrorDialog(s.c_str());
 		return 1;
 	}
-	
+
+	LPCWSTR pApp = nullptr;
+	{
+		LPCWSTR edgeAUMID = L"Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge";
+		LPCWSTR zuneAUMID = L"Microsoft.ZuneVideo_10.17122.16211.1000_x64__8wekyb3d8bbwe";
+		
+		if (app == L"zune")
+		{
+			pApp = zuneAUMID;
+		}
+		else
+		{
+			pApp = edgeAUMID;
+		}
+	}
+
 	for each(const wstring& target in targets)
 	{
 		if (IsFile(target.c_str()))
@@ -323,11 +340,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				sizeof(szT) / sizeof(szT[0]),
 				target.c_str());
 
-			hr = OpenUrlInMicrosoftEdge(szT);
+			hr = OpenUrlInStoreApp(pApp, szT);
 		}
 		else
 		{
-			hr = OpenUrlInMicrosoftEdge(target.c_str());
+			hr = OpenUrlInStoreApp(pApp, target.c_str());
 		}
 		if (FAILED(hr))
 			break;
