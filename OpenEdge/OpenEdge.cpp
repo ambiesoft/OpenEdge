@@ -30,10 +30,12 @@
 
 #include "../../lsMisc/CommandLineParser.h"
 #include "../../lsMisc/GetClipboardText.h"
-#include "../../lsMisc/stdwin32/stdwin32.h"
+#include "../../lsMisc/stdosd/stdosd.h"
+
 using namespace Ambiesoft;
+using namespace Ambiesoft::stdosd;
 using namespace std;
-using namespace stdwin32;
+
 
 #define MAX_LOADSTRING 100
 
@@ -222,7 +224,7 @@ void ErrorDialog(LPCWSTR pMessage, int mb = MB_ICONEXCLAMATION)
 	wstring title;
 	title += APPNAME;
 	title += L" ver";
-	title += VERSION;
+	title += APPVERSION;
 	MessageBox(NULL,
 		message.c_str(),
 		title.c_str(),
@@ -256,7 +258,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	if (parser.hadUnknownOption())
 	{
-		ErrorDialog(string_format(I18N(L"Unknown option(s) %s"),
+		ErrorDialog(stdFormat(I18N(L"Unknown option(s) %s"),
 			parser.getUnknowOptionStrings().c_str()).c_str());
 		return 1;
 	}
@@ -280,21 +282,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			return 1;
 		}
 
-		vector<wstring> lines = stdwin32::split_string_toline(clip);
+		vector<wstring> lines = stdSplitStringToLine(clip);
 		if (lines.size() > 20)
 		{
 			if (IDYES != MessageBox(NULL,
-				I18N(string_format(L"Clipboard texts has %d lines. Are you sure you want to open them all?",
+				I18N(stdFormat(L"Clipboard texts has %d lines. Are you sure you want to open them all?",
 					lines.size()).c_str()),
 				APPNAME,
 				MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2))
 			{
-				return 1;
+				lines.clear();
+				lines.push_back(L"about:blank");
 			}
 		}
 		for (const wstring& line : lines)
 		{
-			targets.emplace_back(stdwin32::trim(line));
+			targets.emplace_back(stdTrim(line));
 		}
 	}
 	for (size_t i = 0; i < mainOption.getValueCount(); ++i)

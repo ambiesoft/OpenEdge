@@ -30,4 +30,4 @@
 
 #define I18N(s) (s)
 #define APPNAME L"OpenEdge"
-#define VERSION L"1.2"
+#define APPVERSION L"1.3.1"
